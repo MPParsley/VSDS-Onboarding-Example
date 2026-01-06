@@ -1,0 +1,10 @@
+# Docker volumes
+fuseki-data/
+
+# Backups
+*.nt
+*.ttl.bak
+*.rdf.bak
+
+# Logs
+*.log
