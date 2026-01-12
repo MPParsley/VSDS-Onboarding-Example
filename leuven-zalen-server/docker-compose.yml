@@ -17,6 +17,8 @@ services:
       - SPRING_TASK_SCHEDULING_POOL_SIZE=5
       - LDESSERVER_FRAGMENTATIONCRON=*/1 * * * * *
       - LDESSERVER_MAINTENANCECRON=-
+      - SPRINGDOC_SWAGGERUI_PATH=/admin/doc/v1/swagger
+      - SPRINGDOC_SWAGGERUI_URLSPRIMARYNAME=base
     volumes:
       - ./config/application.yml:/application.yml:ro
     depends_on:
@@ -48,13 +50,13 @@ services:
       - leuven-zalen
     environment:
       - ADMIN_PASSWORD=admin
-      - JVM_ARGS=-Xmx2g
       - ENABLE_DATA_WRITE=true
       - ENABLE_UPDATE=true
       - ENABLE_UPLOAD=true
       - QUERY_TIMEOUT=30000
     volumes:
-      - fuseki-data:/fuseki
+      - ./fuseki-data:/fuseki-base/databases
+      - ./fuseki-config:/fuseki-base/configuration
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:3030 || exit 1
       interval: 10s
