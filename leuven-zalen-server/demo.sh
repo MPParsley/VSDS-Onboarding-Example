@@ -19,6 +19,7 @@ echo ""
 # Tear down everything
 echo "Stopping and removing all containers..."
 docker-compose down -v
+rm -f state/leuven-zalen-to-fuseki.db 
 echo "✓ All containers stopped and volumes removed"
 pause
 

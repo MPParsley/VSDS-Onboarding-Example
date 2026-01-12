@@ -1,1 +1,6 @@
 .DS_Store
+
+# Runtime data directories
+leuven-zalen-server/fuseki-data/
+leuven-zalen-server/fuseki-config/
+leuven-zalen-server/state/
