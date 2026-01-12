@@ -90,7 +90,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./state:/ldio/zalen:rw
+      - ./state:/ldio/state:rw
     ports:
       - 9008:80
     networks:

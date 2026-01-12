@@ -8,6 +8,9 @@ input:
       - http://ldes-server:8080/zalen/by-page
     sourceFormat: text/turtle
     keep-state: true
+    state: sqlite
+    sqlite:
+      directory: state
     materialisation:
       enabled: true
     retries:

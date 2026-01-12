@@ -5,6 +5,12 @@
 
 set -e
 
+pause() {
+  echo ""
+  read -r -n 1 -s -p "Press any key to continue..."
+  echo ""
+}
+
 echo "================================================"
 echo "Leuven Zalen LDES Demo"
 echo "================================================"
@@ -14,12 +20,12 @@ echo ""
 echo "Stopping and removing all containers..."
 docker-compose down -v
 echo "✓ All containers stopped and volumes removed"
-echo ""
+pause
 
 # Start all services
 echo "Starting all Docker services..."
 docker-compose up -d
-echo ""
+pause
 
 # Wait for services to be healthy
 echo "Waiting for services to be ready..."
@@ -38,27 +44,27 @@ while ! curl -s http://localhost:9003/actuator/health > /dev/null 2>&1; do
     sleep 2
 done
 echo "✓ LDES server is ready"
-echo ""
+pause
 
 # Setup LDES server (event stream and view)
 echo "Setting up LDES server..."
 ./setup-ldes.sh
-echo ""
+pause
 
 # Ingest sample data
 echo "Ingesting sample data..."
 ./ingest-data.sh
-echo ""
+pause
 
 # Setup consumer (Fuseki dataset and LDIO pipeline)
 echo "Setting up LDES consumer..."
 ./setup-consumer.sh
-echo ""
+pause
 
 # Wait for data to be consumed
 echo "Waiting for data to be consumed (20 seconds)..."
 sleep 20
-echo ""
+pause
 
 # Query Fuseki to verify data
 echo "Verifying data in Fuseki triplestore..."
@@ -79,6 +85,8 @@ curl -s -X POST "http://localhost:3032/zalen/sparql" \
     -u admin:admin 2>/dev/null | \
     python3 -c "import sys, json; results = json.load(sys.stdin)['results']['bindings']; print('\n'.join(['  • ' + r['name']['value'] for r in results]))"
 echo ""
+
+pause
 
 echo "================================================"
 echo "Demo Complete!"
