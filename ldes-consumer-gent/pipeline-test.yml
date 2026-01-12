@@ -8,9 +8,14 @@ input:
     urls:
       - https://brugge-ldes.geomobility.eu/observations/by-page
     sourceFormat: application/n-triples
+    materialisation:
+      enabled: true
 outputs:
-  - name: Ldio:RepositoryMaterialiser
+  - name: Ldio:HttpSparqlOut
     config:
-      sparql-host: http://fuseki:3030
-      repository-id: lpdc
-      named-graph: http://test.example.org/graph
+      endpoint: http://fuseki:3030/lpdc/update
+      graph: http://test.example.org/graph
+      auth:
+        type: BASIC
+        user-name: admin
+        password: admin

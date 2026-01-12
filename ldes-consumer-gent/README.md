@@ -17,7 +17,7 @@ LDES Feed (Gent LPDC)
    LDIO Workbench
    (LdesClient)
          ↓
-  RepositoryMaterialiser
+    HttpSparqlOut
          ↓
    Fuseki Triplestore
    (TDB2 dataset)
@@ -51,8 +51,10 @@ docker-compose up -d
 ```
 
 Dit start:
-- Fuseki triplestore op http://localhost:3030
+- Fuseki triplestore op http://localhost:3031
+- RDF4J server op http://localhost:8080
 - LDIO Workbench op http://localhost:9006
+  - API Documentatie: http://localhost:9006/v3/api-docs
 
 ### 2. Setup uitvoeren
 
@@ -154,12 +156,13 @@ input:
   config:
     urls:
       - https://ldes.stad.gent/ldes/lpdc/by-page?pageNumber=1
+    materialisation:
+      enabled: true
 outputs:
-  - name: Ldio:RepositoryMaterialiser
+  - name: Ldio:HttpSparqlOut
     config:
-      sparql-host: http://fuseki:3030
-      repository-id: lpdc
-      named-graph: http://stad.gent/lpdc/graph
+      endpoint: http://fuseki:3030/lpdc/update
+      graph: http://stad.gent/lpdc/graph
 ```
 
 ### Pipeline componenten
@@ -168,16 +171,21 @@ outputs:
 - Consumeert de LDES feed vanaf de opgegeven URL
 - Volgt automatisch TREE relations voor paginatie
 - Synchroniseert continu voor nieuwe members
+- Materialiseert versioned objects naar hun laatste staat (via `materialisation: enabled: true`)
 
-**Output: Ldio:RepositoryMaterialiser**
-- Materialiseert LDES members naar de triplestore
-- Gebruikt SPARQL Update voor het inserten van data
-- Bewaart alleen de laatste versie van elk member (state-georiënteerd)
+**Output: Ldio:HttpSparqlOut**
+- Schrijft LDES members naar de triplestore via SPARQL UPDATE
+- Maakt verbinding met Fuseki's SPARQL update endpoint
+- Vervangt oude versies van members met nieuwe versies
 - Slaat data op in de opgegeven named graph
 
 ## Monitoring
 
 ### LDIO Workbench
+
+**API Documentatie:**
+- OpenAPI/Swagger specificatie: http://localhost:9006/v3/api-docs
+- Actuator health: http://localhost:9006/actuator/health
 
 Bekijk pipeline status:
 ```bash
@@ -258,7 +266,7 @@ curl -X POST http://localhost:9006/admin/api/v1/pipeline \
 De test pipeline gebruikt een publiek toegankelijke LDES feed en valideert dat:
 - LDIO Workbench correct werkt
 - Fuseki verbinding succesvol is
-- RepositoryMaterialiser correct functioneert
+- HttpSparqlOut correct functioneert
 
 ### Geen data in Fuseki
 
