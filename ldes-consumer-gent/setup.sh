@@ -7,7 +7,7 @@ echo "Using pipeline file: $PIPELINE_FILE"
 
 # Wait for Fuseki to be ready
 echo "Waiting for Fuseki to be ready..."
-until curl -s http://localhost:3030/$/ping > /dev/null; do
+until curl -s http://localhost:3031/$/ping > /dev/null; do
   echo "Fuseki not ready yet, waiting..."
   sleep 2
 done
@@ -15,12 +15,15 @@ echo "Fuseki is ready!"
 
 # Create dataset in Fuseki
 echo "Creating dataset 'lpdc' in Fuseki..."
-curl -X POST http://localhost:3030/$/datasets \
+curl -X POST http://localhost:3031/$/datasets \
   -u admin:admin \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data "dbName=lpdc&dbType=tdb2"
 
 echo "Dataset created!"
+
+# Setup RDF4J repository
+./setup-rdf4j.sh
 
 # Wait for LDIO workbench to be ready
 echo "Waiting for LDIO workbench to be ready..."
@@ -41,11 +44,11 @@ echo ""
 echo "========================================"
 echo "Setup complete!"
 echo "========================================"
-echo "Fuseki UI: http://localhost:3030"
+echo "Fuseki UI: http://localhost:3031"
 echo "  - Username: admin"
 echo "  - Password: admin"
 echo "  - Dataset: lpdc"
-echo "  - SPARQL Query endpoint: http://localhost:3030/lpdc/sparql"
+echo "  - SPARQL Query endpoint: http://localhost:3031/#/dataset/lpdc/query"
 echo "  - Graph: http://stad.gent/lpdc/graph"
 echo ""
 echo "LDIO Workbench: http://localhost:9006"

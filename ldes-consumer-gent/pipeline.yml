@@ -7,9 +7,32 @@ input:
     urls:
       - https://ldes.stad.gent/ldes/lpdc/by-page?pageNumber=1
     # sourceFormat: application/n-quads
-outputs:
-  - name: Ldio:RepositoryMaterialiser
+    sourceFormat: text/turtle
+    keep-state: true
+    state: sqlite
+    sqlite:
+      directory: lpdc
+    materialisation:
+      enabled: true
+    retries:
+      enabled: true
+      max: 10
+      statuses-to-retry: 403, 404
+    rate-limit:
+      enabled: true
+      limit: 60
+      period: PT1M
+transformers:
+  - name: Ldio:SkolemisationTransformer
     config:
-      sparql-host: http://fuseki:3030
+      skolem-domain: http://stad.gent/.well-known/genid/
+outputs:
+  # https://openldes.github.io/Linked-Data-Interactions/2.14.0/ldio/ldio-outputs/ldio-repository-sink
+  - name: Ldio:RepositorySink
+    config:
+      sparql-host: http://rdf4j-server:8080/rdf4j-server
       repository-id: lpdc
-      named-graph: http://stad.gent/lpdc/graph
+      named-graph: urn:x-arq:DefaultGraph
+      batch-size: 1
+      batch-timeout: 1000
+      commit-size: 100
