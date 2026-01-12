@@ -1,0 +1,79 @@
+PREFIX :       <http://base/#>
+PREFIX fuseki: <http://jena.apache.org/fuseki#>
+PREFIX ja:     <http://jena.hpl.hp.com/2005/11/Assembler#>
+PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:   <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX tdb2:   <http://jena.apache.org/2016/tdb#>
+
+:tdb_dataset_readwrite
+        rdf:type       tdb2:DatasetTDB2;
+        tdb2:location  "/fuseki-base/databases/lpdc" .
+
+<http://jena.hpl.hp.com/2008/tdb#DatasetTDB>
+        rdfs:subClassOf  ja:RDFDataset .
+
+tdb2:DatasetTDB  rdfs:subClassOf  ja:RDFDataset .
+
+ja:DatasetRDFS  rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.apache.org/access#SecurityRegistry>
+        rdfs:subClassOf  ja:Model .
+
+ja:ViewDataset  rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.apache.org/access#AccessControlledDataset>
+        rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.apache.org/geosparql#geosparqlDataset>
+        rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.hpl.hp.com/2008/tdb#GraphTDB>
+        rdfs:subClassOf  ja:Model .
+
+ja:ViewGraph  rdfs:subClassOf  ja:Model .
+
+ja:RDFDatasetZero  rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.hpl.hp.com/2008/tdb#GraphTDB1>
+        rdfs:subClassOf  ja:Model .
+
+tdb2:GraphTDB2  rdfs:subClassOf  ja:Model .
+
+ja:DatasetTxnMem  rdfs:subClassOf  ja:RDFDataset .
+
+tdb2:GraphTDB  rdfs:subClassOf  ja:Model .
+
+<http://jena.apache.org/geosparql#GeosparqlDataset>
+        rdfs:subClassOf  ja:RDFDataset .
+
+ja:RDFDatasetSink  rdfs:subClassOf  ja:RDFDataset .
+
+:service_tdb_all  rdf:type            fuseki:Service;
+        rdfs:label                    "TDB2 lpdc";
+        fuseki:dataset                :tdb_dataset_readwrite;
+        fuseki:name                   "lpdc";
+        fuseki:serviceQuery           "query" , "sparql" , "";
+        fuseki:serviceReadGraphStore  "get";
+        fuseki:serviceReadWriteGraphStore
+                "data";
+        fuseki:serviceUpdate          "" , "update";
+        fuseki:serviceUpload          "upload" .
+
+<http://jena.apache.org/rdf-patch#LoggedDataset>
+        rdfs:subClassOf  ja:RDFDataset .
+
+ja:RDFDatasetOne  rdfs:subClassOf  ja:RDFDataset .
+
+<http://jena.apache.org/text#TextDataset>
+        rdfs:subClassOf  ja:RDFDataset .
+
+tdb2:DatasetTDB2  rdfs:subClassOf  ja:RDFDataset .
+
+ja:MemoryDataset  rdfs:subClassOf  ja:RDFDataset .
+
+ja:ModelRDFS  rdfs:subClassOf  ja:Model .
+
+<http://jena.hpl.hp.com/2008/tdb#DatasetTDB1>
+        rdfs:subClassOf  ja:RDFDataset .
+
+ja:GraphRDFS  rdfs:subClassOf  ja:Model .

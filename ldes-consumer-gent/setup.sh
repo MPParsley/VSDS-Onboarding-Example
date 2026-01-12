@@ -1,4 +1,30 @@
 #!/bin/bash
+# Demo script for Leuven Zalen LDES Server and Consumer
+# This script tears down everything and sets it all up from scratch
+
+set -e
+
+pause() {
+  echo ""
+  read -r -n 1 -s -p "Press any key to continue..."
+  echo ""
+}
+
+echo "================================================"
+echo "Gent LDES Demo"
+echo "================================================"
+echo ""
+
+# Tear down everything
+echo "Stopping and removing all containers..."
+docker-compose down -v
+echo "✓ All containers stopped and volumes removed"
+pause
+
+# Start all services
+echo "Starting all Docker services..."
+docker-compose up -d
+pause
 
 # Allow optional pipeline file parameter, default to pipeline.yml
 PIPELINE_FILE=${1:-pipeline.yml}
@@ -7,20 +33,24 @@ echo "Using pipeline file: $PIPELINE_FILE"
 
 # Wait for Fuseki to be ready
 echo "Waiting for Fuseki to be ready..."
-until curl -s http://localhost:3031/$/ping > /dev/null; do
+until curl -s http://localhost:3031/\$/ping > /dev/null; do
   echo "Fuseki not ready yet, waiting..."
   sleep 2
 done
 echo "Fuseki is ready!"
 
-# Create dataset in Fuseki
-echo "Creating dataset 'lpdc' in Fuseki..."
-curl -X POST http://localhost:3031/$/datasets \
-  -u admin:admin \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  --data "dbName=lpdc&dbType=tdb2"
-
-echo "Dataset created!"
+# Create dataset in Fuseki if it does not exist yet
+echo "Ensuring dataset 'lpdc' exists in Fuseki..."
+if curl -sf -u admin:admin http://localhost:3031/\$/datasets | grep -q '/lpdc\"'; then
+  echo "Dataset already present, skipping creation."
+else
+  echo "Creating dataset 'lpdc' in Fuseki..."
+  curl -X POST http://localhost:3031/\$/datasets \
+    -u admin:admin \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    --data "dbName=lpdc&dbType=tdb2"
+  echo "Dataset created!"
+fi
 
 # Setup RDF4J repository
 ./setup-rdf4j.sh
