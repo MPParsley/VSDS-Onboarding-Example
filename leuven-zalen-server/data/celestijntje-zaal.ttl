@@ -1,0 +1,46 @@
+@prefix schema: <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix adres: <https://data.vlaanderen.be/ns/adres#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix zaalreservatie: <https://data.vlaanderen.be/ns/zaalreservatie#> .
+@prefix infrastructure: <https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#> .
+
+<https://www.leuven.be/celestijntje-zaal#2026-01-12T10:00:00Z>
+  a schema:Place , infrastructure:Infrastructuurobject ;
+  dcterms:isVersionOf <https://www.leuven.be/celestijntje-zaal> ;
+  prov:generatedAtTime "2026-01-12T10:00:00Z"^^xsd:dateTime ;
+
+  # Basic information
+  schema:name "Celestijntje"@nl ;
+  schema:description "Karaktervolle zaal in een historisch pand, ideaal voor workshops, seminaries en culturele activiteiten."@nl ;
+  schema:identifier "celestijntje-zaal" ;
+
+  # Location
+  locn:address [
+    a locn:Address ;
+    locn:thoroughfare "Hogeschoolplein" ;
+    locn:locatorDesignator "5" ;
+    adres:postcode "3000" ;
+    adres:gemeentenaam "Leuven"@nl
+  ] ;
+
+  # Capacity and facilities
+  schema:maximumAttendeeCapacity "80"^^xsd:integer ;
+
+  # Room characteristics
+  zaalreservatie:oppervlakte "120"^^xsd:decimal ;
+  infrastructure:faciliteiten "WiFi"@nl , "Beamer"@nl , "Geluidsinstallatie"@nl , "Podium"@nl , "Keuken"@nl ;
+
+  # Contact and booking
+  schema:url <https://www.leuven.be/celestijntje-zaal> ;
+  schema:telephone "+32 16 27 27 27" ;
+
+  # Availability status
+  schema:openingHours "Mo-Su 08:00-23:00" ;
+  zaalreservatie:beschikbaar true ;
+
+  # Special characteristics
+  schema:additionalType "Culturele infrastructuur"@nl ;
+  infrastructure:toegankelijkheid "Rolstoeltoegankelijk"@nl .

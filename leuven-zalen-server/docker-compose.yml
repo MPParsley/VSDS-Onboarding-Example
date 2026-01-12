@@ -1,0 +1,36 @@
+services:
+  ldes-server:
+    container_name: leuven-zalen-ldes-server
+    image: ghcr.io/informatievlaanderen/ldes-server:latest
+    ports:
+      - 9003:80
+    networks:
+      - leuven-zalen
+    environment:
+      - SPRING_CONFIG_LOCATION=/config/
+      - LDESSERVER_HOSTNAME=http://localhost:9003
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://leuven-zalen-postgres:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PWD}
+      - LDESSERVER_FRAGMENTATIONCRON=*/1 * * * * *
+      - LDESSERVER_MAINTENANCECRON=-
+    volumes:
+      - ./config/application.yml:/config/application.yml:ro
+    depends_on:
+      - leuven-zalen-postgres
+
+  leuven-zalen-postgres:
+    container_name: leuven-zalen-postgres
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    networks:
+      - leuven-zalen
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PWD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+networks:
+  leuven-zalen:
+    name: leuven-zalen_network

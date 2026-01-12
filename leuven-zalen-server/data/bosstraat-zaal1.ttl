@@ -1,0 +1,42 @@
+@prefix schema: <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix adres: <https://data.vlaanderen.be/ns/adres#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix zaalreservatie: <https://data.vlaanderen.be/ns/zaalreservatie#> .
+@prefix infrastructure: <https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#> .
+
+<https://www.leuven.be/bosstraat-zaal1#2026-01-12T10:00:00Z>
+  a schema:Place , infrastructure:Infrastructuurobject ;
+  dcterms:isVersionOf <https://www.leuven.be/bosstraat-zaal1> ;
+  prov:generatedAtTime "2026-01-12T10:00:00Z"^^xsd:dateTime ;
+
+  # Basic information
+  schema:name "Bosstraat Zaal 1"@nl ;
+  schema:description "Vergaderzaal in het stedelijk administratief centrum, geschikt voor vergaderingen en presentaties."@nl ;
+  schema:identifier "bosstraat-zaal1" ;
+
+  # Location
+  locn:address [
+    a locn:Address ;
+    locn:thoroughfare "Bosstraat" ;
+    locn:locatorDesignator "1" ;
+    adres:postcode "3000" ;
+    adres:gemeentenaam "Leuven"@nl
+  ] ;
+
+  # Capacity and facilities
+  schema:maximumAttendeeCapacity "50"^^xsd:integer ;
+
+  # Room characteristics
+  zaalreservatie:oppervlakte "75"^^xsd:decimal ;
+  infrastructure:faciliteiten "Beamer"@nl , "WiFi"@nl , "Flip-over"@nl ;
+
+  # Contact and booking
+  schema:url <https://www.leuven.be/bosstraat-zaal1> ;
+  schema:telephone "+32 16 27 27 27" ;
+
+  # Availability status
+  schema:openingHours "Mo-Fr 08:00-17:00" ;
+  zaalreservatie:beschikbaar true .

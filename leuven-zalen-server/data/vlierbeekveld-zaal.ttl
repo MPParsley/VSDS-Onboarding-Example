@@ -1,0 +1,49 @@
+@prefix schema: <https://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix adres: <https://data.vlaanderen.be/ns/adres#> .
+@prefix locn: <http://www.w3.org/ns/locn#> .
+@prefix zaalreservatie: <https://data.vlaanderen.be/ns/zaalreservatie#> .
+@prefix infrastructure: <https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#> .
+
+<https://www.leuven.be/vlierbeekveld-zaal#2026-01-12T10:00:00Z>
+  a schema:Place , infrastructure:Infrastructuurobject ;
+  dcterms:isVersionOf <https://www.leuven.be/vlierbeekveld-zaal> ;
+  prov:generatedAtTime "2026-01-12T10:00:00Z"^^xsd:dateTime ;
+
+  # Basic information
+  schema:name "Vlierbeekveld Zaal"@nl ;
+  schema:description "Multifunctionele zaal in een wijkcentrum, geschikt voor buurtactiviteiten, verenigingen en feesten."@nl ;
+  schema:identifier "vlierbeekveld-zaal" ;
+
+  # Location
+  locn:address [
+    a locn:Address ;
+    locn:thoroughfare "Vlierbeekveld" ;
+    locn:locatorDesignator "2" ;
+    adres:postcode "3001" ;
+    adres:gemeentenaam "Heverlee"@nl
+  ] ;
+
+  # Capacity and facilities
+  schema:maximumAttendeeCapacity "100"^^xsd:integer ;
+
+  # Room characteristics
+  zaalreservatie:oppervlakte "150"^^xsd:decimal ;
+  infrastructure:faciliteiten "Keuken"@nl , "Bar"@nl , "Geluidsinstallatie"@nl , "WiFi"@nl , "Parkeergelegenheid"@nl , "Terras"@nl ;
+
+  # Contact and booking
+  schema:url <https://www.leuven.be/vlierbeekveld-zaal> ;
+  schema:telephone "+32 16 27 27 27" ;
+
+  # Availability status
+  schema:openingHours "Mo-Su 08:00-00:00" ;
+  zaalreservatie:beschikbaar true ;
+
+  # Special characteristics
+  schema:additionalType "Wijkcentrum"@nl ;
+  infrastructure:toegankelijkheid "Rolstoeltoegankelijk"@nl , "Toegankelijk met openbaar vervoer"@nl ;
+
+  # Pricing information
+  schema:priceRange "€€" .

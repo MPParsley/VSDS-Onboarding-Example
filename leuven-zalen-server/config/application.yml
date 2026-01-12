@@ -1,0 +1,14 @@
+logging:
+  level:
+    root: WARN
+    be.vlaanderen.informatievlaanderen.ldes.server.Application: INFO
+
+ldes-server:
+  formatting:
+    prefixes:
+      zaalreservatie: https://data.vlaanderen.be/ns/zaalreservatie#
+      infrastructure: https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#
+      leuven-zalen: http://localhost:9003/zalen/
+      schema: https://schema.org/
+      adres: https://data.vlaanderen.be/ns/adres#
+      locn: http://www.w3.org/ns/locn#
