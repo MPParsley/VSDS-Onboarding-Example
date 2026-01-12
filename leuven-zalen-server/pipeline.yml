@@ -1,0 +1,30 @@
+# Pipeline for consuming Leuven Zalen LDES and ingesting into Fuseki triplestore
+name: leuven-zalen-to-fuseki
+description: "Consumes Leuven Zalen LDES feed and stores members in Fuseki triplestore"
+input:
+  name: Ldio:LdesClient
+  config:
+    urls:
+      - http://ldes-server:8080/zalen/by-page
+    sourceFormat: text/turtle
+    keep-state: true
+    materialisation:
+      enabled: true
+    retries:
+      enabled: true
+      max: 5
+      statuses-to-retry: 404, 500, 502, 503, 504
+transformers:
+  - name: Ldio:SkolemisationTransformer
+    config:
+      skolem-domain: http://leuven.be/.well-known/genid/
+outputs:
+  # https://openldes.github.io/Linked-Data-Interactions/2.14.0/ldio/ldio-outputs/ldio-repository-sink
+  - name: Ldio:RepositorySink
+    config:
+      sparql-host: http://rdf4j-server:8080/rdf4j-server
+      repository-id: zalen
+      named-graph: urn:x-arq:DefaultGraph
+      batch-size: 10
+      batch-timeout: 1000
+      commit-size: 100

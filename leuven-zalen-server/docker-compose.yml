@@ -8,7 +8,7 @@ services:
       - leuven-zalen
     environment:
       - SIS_DATA=/tmp
-      - LDESSERVER_HOSTNAME=http://localhost:9003
+      - LDESSERVER_HOSTNAME=http://ldes-server:8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://leuven-zalen-postgres:5432/${POSTGRES_DB}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PWD}
@@ -36,6 +36,117 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PWD}
       - POSTGRES_DB=${POSTGRES_DB}
 
+  ### -- LDES Consumer Services --
+
+  fuseki:
+    image: secoresearch/fuseki:latest
+    container_name: leuven-zalen-fuseki
+    platform: linux/amd64
+    ports:
+      - "3032:3030"
+    networks:
+      - leuven-zalen
+    environment:
+      - ADMIN_PASSWORD=admin
+      - JVM_ARGS=-Xmx2g
+      - ENABLE_DATA_WRITE=true
+      - ENABLE_UPDATE=true
+      - ENABLE_UPLOAD=true
+      - QUERY_TIMEOUT=30000
+    volumes:
+      - fuseki-data:/fuseki
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3030 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rdf4j-server:
+    image: eclipse/rdf4j-workbench:latest
+    container_name: leuven-zalen-rdf4j
+    platform: linux/amd64
+    ports:
+      - "8082:8080"
+    networks:
+      - leuven-zalen
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx2g
+    depends_on:
+      fuseki:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/rdf4j-server/repositories || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ldio-workbench:
+    image: ldes/ldi-orchestrator:2.14.0
+    container_name: leuven-zalen-ldio
+    platform: linux/amd64
+    environment:
+      - SERVER_PORT=80
+      - LOGGING_LEVEL_ROOT=INFO
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./state:/ldio/zalen:rw
+    ports:
+      - 9008:80
+    networks:
+      - leuven-zalen
+    depends_on:
+      fuseki:
+        condition: service_healthy
+      rdf4j-server:
+        condition: service_healthy
+      ldes-server:
+        condition: service_healthy
+      curl-create-rdf4j-repository:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://ldio-workbench/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  curl-create-rdf4j-repository:
+    image: alpine/curl
+    container_name: leuven-zalen-curl-setup
+    restart: 'no'
+    depends_on:
+      rdf4j-server:
+        condition: "service_healthy"
+      fuseki:
+        condition: "service_healthy"
+    command: |
+      curl -X PUT 'http://rdf4j-server:8080/rdf4j-server/repositories/zalen'
+      --header 'Content-Type: text/turtle'
+      --data-raw '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+      @prefix rep: <http://www.openrdf.org/config/repository#>.
+      @prefix sparql: <http://www.openrdf.org/config/sparql#>.
+      @prefix config: <tag:rdf4j.org,2023:config/>.
+      @prefix http: <http://www.w3.org/2011/http#>.
+
+      [] a config:Repository ;
+        config:rep.id "zalen" ;
+        rdfs:label "SPARQL endpoint to Fuseki Zalen dataset" ;
+        config:rep.impl [
+            config:rep.type "openrdf:SPARQLRepository";
+            config:sparql.queryEndpoint <http://fuseki:3030/zalen/sparql>;
+            config:sparql.updateEndpoint <http://fuseki:3030/zalen/update>;
+            http:basicAuthentication [
+              http:authUser "admin";
+              http:authPassword "admin"
+            ]
+        ].'
+    networks:
+      - leuven-zalen
+
 networks:
   leuven-zalen:
     name: leuven-zalen_network
+
+volumes:
+  fuseki-data:
+  ldio-state:
