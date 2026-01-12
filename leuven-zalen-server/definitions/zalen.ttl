@@ -8,7 +8,7 @@
 </zalen> a ldes:EventStream ;
   ldes:timestampPath prov:generatedAtTime ;
   ldes:versionOfPath dcterms:isVersionOf ;
-  ldes:createVersions true ;
+  ldes:createVersions false ;
   tree:shape [
     a sh:NodeShape ;
     sh:closed false

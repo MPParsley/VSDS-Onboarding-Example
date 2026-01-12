@@ -52,35 +52,78 @@ cd leuven-zalen-server
 docker-compose up -d
 ```
 
-3. Wait for the server to initialize (about 30 seconds)
-
-4. Access the LDES stream:
+3. Wait for the server to initialize (about 2-3 minutes). You can monitor the startup process:
 ```bash
-curl http://localhost:9003/zalen
+docker-compose logs -f ldes-server
 ```
 
-### Ingesting Sample Data
+Wait until you see the message: `Started Application in X seconds`
 
-To ingest the sample zalen data into the LDES:
+4. Set up the LDES event stream and view:
+```bash
+./setup-ldes.sh
+```
 
+This script will:
+- Create the `zalen` event stream
+- Configure the paginated view
+- Verify the server is ready
+
+5. Load the sample data:
+```bash
+./ingest-data.sh
+```
+
+This script will ingest all sample zalen data files from the `data/` directory.
+
+6. View the data:
+```bash
+# View the LDES stream metadata
+curl http://localhost:9003/zalen
+
+# View the paginated data (actual zalen members)
+curl http://localhost:9003/zalen/by-page?pageNumber=1
+```
+
+### Manual Setup (Alternative)
+
+If you prefer to set up manually instead of using the scripts:
+
+#### Create Event Stream
+```bash
+curl -X POST http://localhost:9003/admin/api/v1/eventstreams \
+  -H "Content-Type: text/turtle" \
+  --data-binary "@definitions/zalen.ttl"
+```
+
+#### Create Paginated View
+```bash
+curl -X POST http://localhost:9003/admin/api/v1/eventstreams/zalen/views \
+  -H "Content-Type: text/turtle" \
+  --data-binary "@definitions/zalen.by-page.ttl"
+```
+
+#### Ingest Sample Data
+
+Ingest individual files:
 ```bash
 # Ingest Bosstraat Zaal 1
-curl -X POST http://localhost:9003/ldes/zalen \
+curl -X POST http://localhost:9003/zalen \
   -H "Content-Type: text/turtle" \
   --data-binary "@data/bosstraat-zaal1.ttl"
 
 # Ingest Raadzaal
-curl -X POST http://localhost:9003/ldes/zalen \
+curl -X POST http://localhost:9003/zalen \
   -H "Content-Type: text/turtle" \
   --data-binary "@data/raadzaal.ttl"
 
 # Ingest Celestijntje
-curl -X POST http://localhost:9003/ldes/zalen \
+curl -X POST http://localhost:9003/zalen \
   -H "Content-Type: text/turtle" \
   --data-binary "@data/celestijntje-zaal.ttl"
 
 # Ingest Vlierbeekveld
-curl -X POST http://localhost:9003/ldes/zalen \
+curl -X POST http://localhost:9003/zalen \
   -H "Content-Type: text/turtle" \
   --data-binary "@data/vlierbeekveld-zaal.ttl"
 ```
@@ -89,7 +132,7 @@ Or ingest all at once:
 ```bash
 for file in data/*.ttl; do
   echo "Ingesting $file..."
-  curl -X POST http://localhost:9003/ldes/zalen \
+  curl -X POST http://localhost:9003/zalen \
     -H "Content-Type: text/turtle" \
     --data-binary "@$file"
   sleep 1
@@ -98,9 +141,17 @@ done
 
 ## API Endpoints
 
-- **LDES Stream**: `http://localhost:9003/zalen`
-- **Paginated View**: `http://localhost:9003/zalen/by-page`
-- **Ingest Endpoint**: `POST http://localhost:9003/ldes/zalen`
+### Public Endpoints
+- **LDES Stream** (metadata): `http://localhost:9003/zalen`
+- **Paginated View** (data): `http://localhost:9003/zalen/by-page?pageNumber=1`
+- **Ingest Endpoint**: `POST http://localhost:9003/zalen`
+
+### Admin Endpoints
+- **List Event Streams**: `GET http://localhost:9003/admin/api/v1/eventstreams`
+- **Create Event Stream**: `POST http://localhost:9003/admin/api/v1/eventstreams`
+- **Delete Event Stream**: `DELETE http://localhost:9003/admin/api/v1/eventstreams/{collection}`
+- **Create View**: `POST http://localhost:9003/admin/api/v1/eventstreams/{collection}/views`
+- **Health Check**: `http://localhost:9003/actuator/health`
 
 ## Architecture
 
@@ -117,14 +168,25 @@ done
 └─────────────────────┘
 ```
 
-## Configuration Files
+## Project Structure
 
-- `docker-compose.yml` - Service orchestration
-- `.env` - Database credentials
-- `config/application.yml` - LDES Server configuration with namespace prefixes
-- `definitions/zalen.ttl` - LDES stream definition
-- `definitions/zalen.by-page.ttl` - Pagination view definition
-- `data/*.ttl` - Sample zalen data
+```
+leuven-zalen-server/
+├── docker-compose.yml          # Service orchestration
+├── .env                        # Database credentials
+├── setup-ldes.sh              # Script to initialize LDES stream and view
+├── ingest-data.sh             # Script to load sample data
+├── config/
+│   └── application.yml        # LDES Server configuration with namespace prefixes
+├── definitions/
+│   ├── zalen.ttl              # LDES stream definition
+│   └── zalen.by-page.ttl      # Pagination view definition
+└── data/
+    ├── bosstraat-zaal1.ttl    # Sample data: Bosstraat meeting room
+    ├── raadzaal.ttl           # Sample data: Council chamber
+    ├── celestijntje-zaal.ttl  # Sample data: Cultural venue
+    └── vlierbeekveld-zaal.ttl # Sample data: Community center
+```
 
 ## Versioning
 
@@ -149,13 +211,40 @@ Example:
   zaalreservatie:beschikbaar true .
 ```
 
+## Troubleshooting
+
+### Server returns "Empty reply from server"
+If you get an empty reply when accessing `http://localhost:9003/zalen`, the server may still be initializing. Wait 2-3 minutes for the startup process to complete. Check the logs:
+```bash
+docker-compose logs ldes-server | grep "Started Application"
+```
+
+### Server returns "Resource of type: eventstream with id: zalen could not be found"
+The event stream hasn't been created yet. Run the setup script:
+```bash
+./setup-ldes.sh
+```
+
+### Data ingestion fails with validation errors
+If you see SHACL validation errors about `versionOf` or `timestamp` paths, check that the stream definition has `ldes:createVersions false` in `definitions/zalen.ttl`. The sample data already includes these properties.
+
+### Check server health
+```bash
+curl http://localhost:9003/actuator/health
+```
+
+### View server logs
+```bash
+docker-compose logs -f ldes-server
+```
+
 ## Stopping the Server
 
 ```bash
 docker-compose down
 ```
 
-To also remove the data volume:
+To also remove the data volume and start fresh:
 ```bash
 docker-compose down -v
 ```
