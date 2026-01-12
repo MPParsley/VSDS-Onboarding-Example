@@ -51,8 +51,28 @@ sleep 20
 
 ### Step 2: Query All Zalen
 
-Query all zalen currently in the Fuseki triplestore:
+Query all zalen currently in the Fuseki triplestore.
 
+**SPARQL Query:**
+```sparql
+PREFIX schema: <https://schema.org/>
+
+SELECT DISTINCT ?name
+WHERE {
+  ?zaal schema:name ?name
+}
+ORDER BY ?name
+```
+
+**Using Fuseki UI:**
+1. Open http://localhost:3032 in your browser
+2. Login with username: `admin`, password: `admin`
+3. Select the `zalen` dataset
+4. Go to the "Query" tab
+5. Paste the SPARQL query above
+6. Click "Execute"
+
+**Using curl:**
 ```bash
 curl -X POST "http://localhost:3032/zalen/sparql" \
   --data-urlencode 'query=PREFIX schema: <https://schema.org/> SELECT DISTINCT ?name WHERE { ?zaal schema:name ?name } ORDER BY ?name' \
@@ -80,8 +100,33 @@ sleep 10
 
 ### Step 4: Query Zalen with Details
 
-Query all zalen with their capacity, surface area, and facilities:
+Query all zalen with their capacity, surface area, and facilities.
 
+**SPARQL Query:**
+```sparql
+PREFIX schema: <https://schema.org/>
+PREFIX infra: <https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#>
+PREFIX zaalres: <https://data.vlaanderen.be/ns/zaalreservatie#>
+
+SELECT ?name ?capacity ?oppervlakte ?faciliteit
+WHERE {
+  ?zaal schema:name ?name .
+  OPTIONAL { ?zaal schema:maximumAttendeeCapacity ?capacity }
+  OPTIONAL { ?zaal zaalres:oppervlakte ?oppervlakte }
+  OPTIONAL { ?zaal infra:faciliteiten ?faciliteit }
+}
+ORDER BY ?name
+```
+
+**Using Fuseki UI:**
+1. Open http://localhost:3032 in your browser
+2. Login with username: `admin`, password: `admin`
+3. Select the `zalen` dataset
+4. Go to the "Query" tab
+5. Paste the SPARQL query above
+6. Click "Execute"
+
+**Using curl:**
 ```bash
 curl -X POST "http://localhost:3032/zalen/sparql" \
   --data-urlencode 'query=PREFIX schema: <https://schema.org/> PREFIX infra: <https://data.vlaanderen.be/ns/cultuur-en-jeugd/infrastructuur#> PREFIX zaalres: <https://data.vlaanderen.be/ns/zaalreservatie#> SELECT ?name ?capacity ?oppervlakte ?faciliteit WHERE { ?zaal schema:name ?name . OPTIONAL { ?zaal schema:maximumAttendeeCapacity ?capacity } OPTIONAL { ?zaal zaalres:oppervlakte ?oppervlakte } OPTIONAL { ?zaal infra:faciliteiten ?faciliteit } } ORDER BY ?name' \
