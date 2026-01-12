@@ -1,0 +1,16 @@
+# Test pipeline met publieke LDES feed (Brugge) om de setup te valideren
+# Gebruik pipeline.yml voor de Gent LPDC feed wanneer deze bereikbaar is
+name: test-ldes-to-fuseki
+description: "Test pipeline met Brugge LDES feed om Fuseki integratie te valideren"
+input:
+  name: Ldio:LdesClient
+  config:
+    urls:
+      - https://brugge-ldes.geomobility.eu/observations/by-page
+    sourceFormat: application/n-triples
+outputs:
+  - name: Ldio:RepositoryMaterialiser
+    config:
+      sparql-host: http://fuseki:3030
+      repository-id: lpdc
+      named-graph: http://test.example.org/graph

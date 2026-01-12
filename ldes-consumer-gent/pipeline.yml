@@ -1,0 +1,15 @@
+# Pipeline for consuming Gent LPDC LDES and ingesting into Fuseki triplestore
+name: gent-lpdc-to-fuseki
+description: "Consumes Gent LPDC LDES and stores members in Fuseki triplestore"
+input:
+  name: Ldio:LdesClient
+  config:
+    urls:
+      - https://ldes.stad.gent/ldes/lpdc/by-page?pageNumber=1
+    # sourceFormat: application/n-quads
+outputs:
+  - name: Ldio:RepositoryMaterialiser
+    config:
+      sparql-host: http://fuseki:3030
+      repository-id: lpdc
+      named-graph: http://stad.gent/lpdc/graph
